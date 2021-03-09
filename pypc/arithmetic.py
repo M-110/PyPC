@@ -1,4 +1,5 @@
-from nand import nand
+from .nand import nand
+
 
 def half_adder(a: bool, b: bool) -> (bool, bool):
     """Returns a + b in the form of a tuple of two bools representing the two
