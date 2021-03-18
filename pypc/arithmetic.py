@@ -9,6 +9,7 @@ def half_adder(a: bool, b: bool) -> (bool, bool):
     nand_d = nand(nand_a_b, b)
     high = nand(nand_a_b, nand_a_b)
     low = nand(nand_c, nand_d)
+
     return high, low
 
 
@@ -18,7 +19,6 @@ def full_adder(a: bool, b: bool, c: bool) -> (bool, bool):
     
     Carried value is ignored.
     """
-    print(f'{a=}, {b=}, {c=}')
     nand_a_b = nand(a, b)
     nand_c = nand(nand_a_b, a)
     nand_d = nand(nand_a_b, b)
@@ -28,6 +28,6 @@ def full_adder(a: bool, b: bool, c: bool) -> (bool, bool):
     nand_f = nand(nand_low_a_b_c, c)
     high = nand(nand_a_b, nand_low_a_b_c)
     low = nand(nand_e, nand_f)
-    print(f'{high=}, {low=}')
+
     return high, low
 

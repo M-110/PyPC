@@ -17,7 +17,14 @@ def int_to_bits(num):
     return bits
     
 if __name__ == "__main__":
-    a = int_to_bits(9)
+
+    a = [True if a == '1' else False for a in '0000000000000001']
+    b = [True if a == '1' else False for a in '0000000000000001']
+
+    c = adder_16(a, b)
+    c = ''.join(['1' if x else '0' for x in c])
+    print(c)
+    a = int_to_bits(32768)
     print('a', binary_to_int(a))
     b = int_to_bits(32767)
     
