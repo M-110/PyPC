@@ -2,10 +2,10 @@
 from typing import Callable
 
 
-def latch_factory(initial_state=False) -> Callable:
+def latch_factory() -> Callable:
     """Created a latch function containing a closure that maintains
     the state in order to simulate sequential logic."""
-    state = initial_state
+    state = False
 
     def latch(store: bool, d: bool) -> bool:
         """If store is True, the latch output will be set to d, otherwise
@@ -19,13 +19,14 @@ def latch_factory(initial_state=False) -> Callable:
 
     return latch
 
-def dff_factory():
+
+def dff_factory() -> Callable:
     """Create a dff function containing a closure that maintains
     the two inner states in order to simulate sequential logic."""
     state_1 = False
     state_2 = False
 
-    def dff(store: bool, d: bool, clock: bool) -> bool:
+    def dff(load: bool, in_: bool, clock: bool) -> bool:
         """A Data Flip-Flop component which stores and outputs a bit.
         
         The output only changes to the stored value when the clock
@@ -37,9 +38,9 @@ def dff_factory():
         """
         nonlocal state_1, state_2
         not_cl = nand(clock, clock)
-        nand_1 = nand(store, not_cl)
+        nand_1 = nand(load, not_cl)
         not_nand_1 = nand(nand_1, nand_1)
-        nand_2 = nand(not_nand_1, d)
+        nand_2 = nand(not_nand_1, in_)
         nand_3 = nand(nand_1, state_1)
         state_1 = nand(nand_2, nand_3)
         nand_5 = nand(clock, state_1)
@@ -48,12 +49,3 @@ def dff_factory():
         return state_2
 
     return dff
-
-
-def bit_factory():
-    dff = dff_factory()
-    
-    def bit(in_: bool, load: bool):
-        mux_out = False
-        return dff(mux_out)
-    return bit
