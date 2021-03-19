@@ -2,7 +2,13 @@
 from pypc.b_basic_logic.core_logic_gates import or_, not_
 from pypc.b_basic_logic.selectors import mux
 from typing import Tuple
-from pypc.typing import Bool16
+from pypc.pypc_typing import Bool16
+
+
+# nand gates used: 0
+def less_than_zero(in_: Bool16) -> bool:
+    """Returns True if input is negative."""
+    return in_[0]
 
 
 # nand gates used: 46

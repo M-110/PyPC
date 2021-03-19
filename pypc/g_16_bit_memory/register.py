@@ -5,7 +5,7 @@ Bool16 = Tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool,
 
 
 # nand gates used: 144
-def register_16_bit_factory() -> Callable:
+def register_16_bit_factory() -> Callable[[Bool16, bool, bool], Bool16]:
     bit_1 = dff_factory()
     bit_2 = dff_factory()
     bit_3 = dff_factory()

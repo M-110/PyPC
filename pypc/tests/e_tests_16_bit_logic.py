@@ -1,4 +1,5 @@
 ﻿from pypc.e_16_bit_logic.core_logic_gates_16 import or_16, and_16, not_16
+from pypc.e_16_bit_logic.selectors_16 import mux_16
 import unittest
 from random import randint
 
@@ -37,6 +38,11 @@ class TestLogic16Gates(unittest.TestCase):
     def test_not(self):
         for pair in self.test_pair_arrays:
             self.assertEqual(self.py_not_16(pair[0]), not_16(pair[0]))
+    
+    def test_mux(self):
+        for a, b in self.test_pair_arrays:
+            self.assertEqual(mux_16(True, a, b), a)
+            self.assertEqual(mux_16(False, a, b), b)
 
 
 run_tests(TestLogic16Gates)

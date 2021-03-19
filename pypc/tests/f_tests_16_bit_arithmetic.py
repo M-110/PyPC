@@ -4,6 +4,8 @@ from typing import Tuple
 from random import randint
 import unittest
 
+from pypc.tests._converter import int_to_bool16, bool16_to_int
+
 Bool16 = Tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool]
 
 
@@ -17,18 +19,24 @@ class TestArithmetic16(unittest.TestCase):
     def setUp(self):
         self.a = register_16_bit_factory()
         self.b = register_16_bit_factory()
-        self.values = ((randint(0, 32767), randint(0, 32767)) for _ in range(2000))
+        self.values = ((-32767, 32766),
+                       (-32768, 0),
+                       (-32768, 1),
+                       (0, 32767),
+                       (-16232, 16232),
+                       (-32767, -1),
+                       (1, 32766),
+                       (0, 0),
+                       (-1, -1),
+                       (1, 1),
+                       (0, 1),
+                       (0, -1),
+                       (-1, 0),
+                       )
 
-    def _int_to_bool16(self, num: int) -> Bool16:
-        binary_string = bin(num)[2:].zfill(16)
-        return tuple(True if char == '1' else False for char in binary_string)
-
-    def _bool16_to_int(self, bools: Bool16) -> int:
-        binary_string = ''.join(['1' if char else '0' for char in bools])
-        return int(binary_string, 2)
 
     def _set_register_to_int(self, register, num: int):
-        num_bool16 = self._int_to_bool16(num)
+        num_bool16 = int_to_bool16(num)
         register(num_bool16, True, False)
         register(clock=True)
         register(clock=False)
@@ -38,9 +46,8 @@ class TestArithmetic16(unittest.TestCase):
             self._set_register_to_int(self.a, a)
             self._set_register_to_int(self.b, b)
             c_bools = adder_16(self.a(), self.b())
-            c = self._bool16_to_int(c_bools)
+            c = bool16_to_int(c_bools)
             self.assertEqual(a + b, c)
-
 
 
 run_tests(TestArithmetic16)
