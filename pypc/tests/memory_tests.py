@@ -1,4 +1,4 @@
-﻿from pypc.memory import latch_factory, dff_factory
+﻿from pypc.d_basic_memory.memory import latch_factory, dff_factory
 import unittest
 
 

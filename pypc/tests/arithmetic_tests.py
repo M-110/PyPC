@@ -1,4 +1,4 @@
-﻿from pypc.arithmetic import half_adder, full_adder
+﻿from pypc.c_basic_arithmetic.arithmetic import half_adder, full_adder
 import unittest
 
 

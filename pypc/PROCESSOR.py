@@ -1,5 +1,5 @@
-﻿from pypc.register import register_16_bit_factory
-from pypc.arithmetic_16 import adder_16
+﻿from pypc.g_16_bit_memory.register import register_16_bit_factory
+from pypc.f_16_bit_arithmetic.arithmetic_16 import adder_16
 
 
 

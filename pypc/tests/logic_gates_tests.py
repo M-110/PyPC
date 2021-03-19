@@ -1,4 +1,4 @@
-﻿from pypc.logic_gates import nand, not_, xor_, and_, or_
+﻿from pypc.b_basic_logic.core_logic_gates import nand, not_, xor_, and_, or_
 import unittest
 
 

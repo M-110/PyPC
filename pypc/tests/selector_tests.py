@@ -1,4 +1,4 @@
-﻿from pypc.selectors import mux, demux
+﻿from pypc.b_basic_logic.selectors import mux, demux
 import unittest
 
 

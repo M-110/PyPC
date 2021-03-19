@@ -1,4 +1,4 @@
-﻿from pypc.logic_gates_16 import or_16, and_16, not_16
+﻿from pypc.e_16_bit_logic.core_logic_gates_16 import or_16, and_16, not_16
 import unittest
 from random import randint
 
