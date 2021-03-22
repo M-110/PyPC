@@ -1,7 +1,9 @@
 from pypc.a_primitives.nand import nand
 
-
 # nand gates used: 4
+from pypc.pypc_typing import Bool2, Bool4, Bool3, Bool8
+
+
 def mux(selector: bool, a: bool, b: bool) -> bool:
     """Multiplexer: returns a if selector is True, otherwise returns b."""
     not_selector = nand(selector, selector)
@@ -24,3 +26,19 @@ def demux(selector: bool, in_: bool) -> (bool, bool):
     a = nand(nand_s_in, nand_s_in)
     b = nand(nand_not_s_in, nand_not_s_in)
     return a, b
+
+
+# nand gates used: 15
+def demux_4way(in_: bool, selectors: Bool2) -> Bool4:
+    x, y = demux(selectors[1], in_)
+    a, b = demux(selectors[0], x)
+    c, d = demux(selectors[0], y)
+    return a, b, c, d
+
+
+# nand gates used: 35
+def demux_8way(in_: bool, selectors: Bool3) -> Bool8:
+    x, y = demux(selectors[2], in_)
+    a, b, c, d = demux_4way(x, selectors[0:2])
+    e, f, g, h = demux_4way(y, selectors[0:2])
+    return a, b, c, d, e, f, g, h
