@@ -53,6 +53,7 @@ def dff_factory() -> Callable:
 
     return dff
 
+
 # nand gates used: 4
 def bit_factory() -> Callable:
     """Created a bit component which stores its output.py

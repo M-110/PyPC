@@ -2,6 +2,8 @@
 from pypc.b_basic_logic.selectors import mux
 from typing import Tuple
 
+from pypc.pypc_typing import Bool2
+
 Bool16 = Tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool]
 
 
@@ -24,3 +26,13 @@ def mux_16(selector: bool, a: Bool16, b: Bool16) -> Bool16:
             mux(selector, a[13], b[13]),
             mux(selector, a[14], b[14]),
             mux(selector, a[15], b[15]))
+
+
+def mux_16_4way(selectors: Bool2, a: Bool16, b: Bool16, c: Bool16, d: Bool16) -> Bool16:
+    """16 bit multiplexer which can choose from 4 inputs.
+        
+        returns a if selectors = False, False
+        returns b if selectors = False, True
+        returns c if selectors = True, False
+        returns d if selectors = True, True
+        """
