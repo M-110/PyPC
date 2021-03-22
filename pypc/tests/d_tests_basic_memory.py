@@ -1,4 +1,4 @@
-﻿from pypc.d_basic_memory.memory import latch_factory, dff_factory
+﻿from pypc.d_basic_memory.memory import latch_factory, dff_factory, bit_factory
 import unittest
 
 
@@ -65,6 +65,18 @@ class TestMemory(unittest.TestCase):
                          False)
         self.assertEqual(dff(False, False, False),
                          False)
+        
+    def test_bit(self):
+        bit = bit_factory()
+        self.assertEqual(bit(False, False), False)
+        self.assertEqual(bit(True, False), False)
+        self.assertEqual(bit(True, True), True)
+        self.assertEqual(bit(False, False), True)
+        self.assertEqual(bit(True, False), True)
+        self.assertEqual(bit(False, True), False)
+        self.assertEqual(bit(False, False), False)
+        self.assertEqual(bit(True, False), False)
+        
 
 
 run_tests(TestMemory)

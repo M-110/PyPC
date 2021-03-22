@@ -21,6 +21,7 @@ def latch_factory() -> Callable:
     return latch
 
 
+# TODO: Possibly remove if clock is deemed unnecessary.
 # nand gates used: 9
 def dff_factory() -> Callable:
     """Create a dff function containing a closure that maintains
@@ -51,3 +52,22 @@ def dff_factory() -> Callable:
         return state_2
 
     return dff
+
+# nand gates used: 4
+def bit_factory() -> Callable:
+    """Created a bit component which stores its output.py
+    
+    If load is False, the bit will continue to output what
+    it previously did.
+    """
+    state = False
+
+    def bit(in_: bool, load: bool):
+        nonlocal state
+        not_load = nand(load, load)
+        nand_1 = nand(in_, load)
+        nand_2 = nand(not_load, state)
+        state = nand(nand_1, nand_2)
+        return state
+
+    return bit

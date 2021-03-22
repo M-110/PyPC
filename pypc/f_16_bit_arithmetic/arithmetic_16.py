@@ -27,6 +27,7 @@ def adder_16(a: Bool16, b: Bool16) -> Bool16:
             sum_9, sum_10, sum_11, sum_12, sum_13, sum_14, sum_15, sum_16)
 
 
+# nand gates used: 80
 def inc_16(in_: Bool16) -> Bool16:
     """Increases the input value by 1."""
     carry, sum_1 = half_adder(in_[0], True)

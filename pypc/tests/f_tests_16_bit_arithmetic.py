@@ -1,5 +1,5 @@
 ﻿from pypc.f_16_bit_arithmetic.arithmetic_16 import adder_16, inc_16
-from pypc.g_16_bit_memory.register import register_16_bit_factory
+from pypc.g_16_bit_memory.register import register_16_bit_factory_clocked
 from typing import Tuple
 from random import randint
 import unittest
@@ -17,8 +17,8 @@ def run_tests(test_class):
 
 class TestArithmetic16(unittest.TestCase):
     def setUp(self):
-        self.a = register_16_bit_factory()
-        self.b = register_16_bit_factory()
+        self.a = register_16_bit_factory_clocked()
+        self.b = register_16_bit_factory_clocked()
         self.values = ((-32767, 32766),
                        (-32768, 0),
                        (-32768, 1),
