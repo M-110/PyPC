@@ -2,7 +2,7 @@
 from pypc.b_basic_logic.selectors import mux
 from typing import Tuple
 
-from pypc.pypc_typing import Bool2
+from pypc.pypc_typing import Bool2, Bool3
 
 Bool16 = Tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool]
 
@@ -28,6 +28,7 @@ def mux_16(selector: bool, a: Bool16, b: Bool16) -> Bool16:
             mux(selector, a[15], b[15]))
 
 
+# nand gates used: 192
 def mux_16_4way(selectors: Bool2, a: Bool16, b: Bool16, c: Bool16, d: Bool16) -> Bool16:
     """16 bit multiplexer which can choose from 4 inputs.
         
@@ -35,4 +36,27 @@ def mux_16_4way(selectors: Bool2, a: Bool16, b: Bool16, c: Bool16, d: Bool16) ->
         returns b if selectors = False, True
         returns c if selectors = True, False
         returns d if selectors = True, True
-        """
+    """
+
+    mux_ab = mux_16(selectors[0], a, b)
+    mux_cd = mux_16(selectors[0], c, d)
+    return mux_16(selectors[1], mux_ab, mux_cd)
+
+
+# nand gates used: 448
+def mux_16_8way(selectors: Bool3, a: Bool16, b: Bool16, c: Bool16, d: Bool16,
+                e: Bool16, f: Bool16, g: Bool16, h: Bool16) -> Bool16:
+    """16 bit multiplexer which can choose from 8 inputs.
+    
+        returns a if selectors = True, True, True
+        returns b if selectors = False, True, True
+        returns c if selectors = True, False, True
+        returns d if selectors = False, False, True
+        returns e if selectors = True, True, False
+        returns f if selectors = False, True, False
+        returns g if selectors = True, False, False
+        returns h if selectors = False, False, False
+    """
+    mux_abcd = mux_16_4way(selectors[:2], a, b, c, d)
+    mux_efgh = mux_16_4way(selectors[:2], e, f, g, h)
+    return mux_16(selectors[2], mux_abcd, mux_efgh)
