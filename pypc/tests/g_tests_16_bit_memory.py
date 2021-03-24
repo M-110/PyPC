@@ -1,4 +1,5 @@
-﻿from typing import Callable
+﻿from itertools import product
+from typing import Callable
 from random import randint
 import unittest
 
@@ -6,6 +7,8 @@ from pypc.g_16_bit_memory.program_counter import pc_factory
 from pypc.pypc_typing import Bool16
 from pypc.g_16_bit_memory.register import register_16_bit_factory_clocked, register_16_bit_factory
 from pypc.tests._converter import bool16_to_int, int_to_bool16
+
+from g_16_bit_memory.ram import ram_8_factory, ram_64_factory
 
 
 def run_tests(test_class):
@@ -94,5 +97,47 @@ class TestMemory16(unittest.TestCase):
             self.assertEqual(pc(),
                              num_plus_1)
 
+    def test_ram_8(self):
+        ram_8 = ram_8_factory()
+        nums = [-32768, -1, 0, 1, 32763, -21845, 21845, 10922]
+        a, b, c, d, e, f, g, h = [int_to_bool16(num) for num in nums]
+        a_address = True, True, True
+        b_address = True, True, False
+        c_address = True, False, True
+        d_address = True, False, False
+        e_address = False, True, True
+        f_address = False, True, False
+        g_address = False, False, True
+        h_address = False, False, False
+        ram_8(in_=a, load=True, address=a_address)
+        ram_8(in_=b, load=True, address=b_address)
+        ram_8(in_=c, load=True, address=c_address)
+        ram_8(in_=d, load=True, address=d_address)
+        ram_8(in_=e, load=True, address=e_address)
+        ram_8(in_=f, load=True, address=f_address)
+        ram_8(in_=g, load=True, address=g_address)
+        ram_8(in_=h, load=True, address=h_address)
+
+        self.assertEqual(a, ram_8(in_=(False,) * 16, load=False, address=a_address))
+        self.assertEqual(b, ram_8(in_=(False,) * 16, load=False, address=b_address))
+        self.assertEqual(c, ram_8(in_=(False,) * 16, load=False, address=c_address))
+        self.assertEqual(d, ram_8(in_=(False,) * 16, load=False, address=d_address))
+        self.assertEqual(e, ram_8(in_=(False,) * 16, load=False, address=e_address))
+        self.assertEqual(f, ram_8(in_=(False,) * 16, load=False, address=f_address))
+        self.assertEqual(g, ram_8(in_=(False,) * 16, load=False, address=g_address))
+        self.assertEqual(h, ram_8(in_=(False,) * 16, load=False, address=h_address))
+
+    def test_ram_64(self):
+        ram_64 = ram_64_factory()
+        nums = [int_to_bool16(randint(-32000, 32000)) for _ in range(64)]
+        addresses = list(product([True, False], repeat=6))
+        
+        for num, address in zip(nums, addresses):
+            ram_64(in_=num, load=True, address=address)
+
+        for num, address in zip(nums, addresses):
+            out = ram_64(in_=(False,) * 16, load=False, address=address)
+            self.assertEqual(num, out)
+            
 
 run_tests(TestMemory16)
