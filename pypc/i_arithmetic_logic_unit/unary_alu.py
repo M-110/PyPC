@@ -4,6 +4,7 @@ from pypc.e_16_bit_logic.core_logic_gates_16 import not_16
 from pypc.h_16_bit_conditionals.conditionals_16 import less_than_zero, equal_to_zero
 
 
+# nand gates used: 144
 def unary_alu(zero: bool, negation: bool, in_: Bool16) -> Bool16:
     """A unary arithmetic logic unit which can optionally zero the input
     or negate the output.

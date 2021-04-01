@@ -1,13 +1,11 @@
-﻿from pypc.b_basic_logic.selectors import demux_8way
-from pypc.e_16_bit_logic.selectors_16 import mux_16_8way
+﻿from pypc.b_basic_logic.selectors import demux_8way, demux_4way
+from pypc.e_16_bit_logic.selectors_16 import mux_16_8way, mux_16_4way
 from pypc.g_16_bit_memory.register import register_16_bit_factory
-from pypc.pypc_typing import Bool3, Bool16
+from pypc.pypc_typing import Bool3, Bool16, Bool14, Bool6, Bool9, Bool12
+
 
 # demux8way = 35, mux8way16 = 448
 # nand gates used: 995
-from b_basic_logic.selectors import demux_4way
-from e_16_bit_logic.selectors_16 import mux_16_4way
-from pypc_typing import Bool6, Bool9, Bool12
 
 
 def ram_8_factory():
@@ -125,7 +123,7 @@ def ram_16k_factory():
     ram_4k_c = ram_4k_factory()
     ram_4k_d = ram_4k_factory()
 
-    def ram_4k(in_: Bool16, load: bool, address: Bool12) -> Bool16:
+    def ram_16k(in_: Bool16, load: bool, address: Bool14) -> Bool16:
         """Memory using 16,384 16-bit registers."""
         load_a, load_b, load_c, load_d = demux_4way(load, address[0:2])
         return mux_16_4way(address,
@@ -134,4 +132,4 @@ def ram_16k_factory():
                            ram_4k_c(in_, load_c, address[2:14]),
                            ram_4k_d(in_, load_d, address[2:14]))
 
-    return ram_4k
+    return ram_16k

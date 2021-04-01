@@ -1,5 +1,7 @@
 ﻿import unittest
 from itertools import product, combinations_with_replacement
+from typing import Tuple
+
 from pypc.i_arithmetic_logic_unit.unary_alu import unary_alu
 from pypc.f_16_bit_arithmetic.arithmetic_16 import adder_16
 from pypc.i_arithmetic_logic_unit.alu import alu
@@ -33,7 +35,8 @@ class TestALU(unittest.TestCase):
             self.assertEqual(~0, num_zn)
             self.assertEqual(num, num_plain)
 
-    def py_alu(self, zx: bool, nx: bool, zy: bool, ny: bool, f: bool, no: bool, x: Bool16, y: Bool16) -> Bool16:
+    def py_alu(self, zx: bool, nx: bool, zy: bool, ny: bool, f: bool, no: bool,
+               x: Bool16, y: Bool16) -> Tuple[Bool16, bool, bool]:
         """Python implementation of an ALU to use as a comparison."""
         if zx:
             x = (False,) * 16
@@ -47,10 +50,14 @@ class TestALU(unittest.TestCase):
             f_out = adder_16(x, y)
         else:
             f_out = tuple(x_i and y_i for x_i, y_i in zip(x, y))
+
         if no:
-            return tuple(not i for i in f_out)
-        else:
-            return f_out
+            f_out = tuple(not i for i in f_out)
+
+        is_zero = bool16_to_int(f_out) == 0
+        is_negative = bool16_to_int(f_out) < 0
+            
+        return f_out, is_zero, is_negative
 
     def test_alu(self):
         """2,880 combinations will be tested here. (9+8+7+6+5+4+3+2+1 * 2^6 = 2,880)"""

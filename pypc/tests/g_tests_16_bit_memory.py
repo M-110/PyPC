@@ -3,12 +3,13 @@ from typing import Callable
 from random import randint, sample
 import unittest
 
+from pypc.g_16_bit_memory.fake_memory import FakeRAM
 from pypc.g_16_bit_memory.program_counter import pc_factory
 from pypc.pypc_typing import Bool16
 from pypc.g_16_bit_memory.register import register_16_bit_factory_clocked, register_16_bit_factory
 from pypc.tests._converter import bool16_to_int, int_to_bool16
 
-from g_16_bit_memory.ram import ram_8_factory, ram_64_factory, ram_512_factory, ram_4k_factory, ram_16k_factory
+from pypc.g_16_bit_memory.ram import ram_8_factory, ram_64_factory, ram_512_factory, ram_4k_factory, ram_16k_factory
 
 
 def run_tests(test_class):
@@ -176,6 +177,19 @@ class TestMemory16(unittest.TestCase):
 
         for num, address in zip(nums, addresses):
             out = ram_16k(in_=(False,) * 16, load=False, address=address)
+            self.assertEqual(num, out)
+            
+    def test_fake_ram_16k(self):
+        # Limit test to 50 random integers stored in 50 random addresses
+        nums = [int_to_bool16(randint(-32000, 32000)) for _ in range(50)]
+        addresses = sample(list(product([True, False], repeat=14)), 50)
+        fake_ram_16k = FakeRAM()
+        
+        for num, address in zip(nums, addresses):
+            fake_ram_16k(in_=num, load=True, address=address)
+
+        for num, address in zip(nums, addresses):
+            out = fake_ram_16k(in_=(False,) * 16, load=False, address=address)
             self.assertEqual(num, out)
             
 

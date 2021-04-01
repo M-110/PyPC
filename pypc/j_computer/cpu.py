@@ -40,104 +40,106 @@ C instructions begin with 1:
     
 """
 
-a_register = register_16_bit_factory()
-d_register = register_16_bit_factory()
-pc = pc_factory()
 
+# nand gates used: 1206
+def cpu_factory():
+    alu_out: Bool16 = (False,) * 16
+    a_register = register_16_bit_factory()
+    d_register = register_16_bit_factory()
+    pc = pc_factory()
 
-def cpu(m_in: Bool16, instructions: Bool16, reset: bool) \
-        -> Tuple[Bool16, bool, Bool15, Bool15]:
-    """Simulation of the CPU unit.
-    
-    Args:
-        m_in: Value of the M RAM input.
-        instructions: 16 bit instructions for the CPU to follow.
-        reset: If True, program will be restarted.
+    def cpu(m_in: Bool16, instructions: Bool16, reset: bool) \
+            -> Tuple[Bool16, bool, Bool15, Bool15]:
+        """Simulation of the CPU unit.
         
-    Returns:
-        (a, b, c, d) where
-        a: M output value.
-        b: Write to M instruction.
-        c: Address of M
-        d: address of the next instruction
-    """
+        Args:
+            m_in: Value of the M RAM input.
+            instructions: 16 bit instructions for the CPU to follow.
+            reset: If True, program will be restarted.
+            
+        Returns:
+            (a, b, c, d) where
+            a: M output value.
+            b: Write to M instruction.
+            c: Address of M
+            d: address of the next instruction
+        """
+        nonlocal alu_out
 
-    alu_out = Bool16
+        # If first instruction digit is 1, then it is a C instruction.
+        a_instruction = not_(instructions[15])
+        c_instruction = not_(a_instruction)
 
-    # If first instruction digit is 1, then it is a C instruction.
-    a_instruction = not_(instructions[15])
-    c_instruction = not_(a_instruction)
+        # # # # # # # # # # # # # # Register A
+        # instructions[5] represents whether A is the destination
+        alu_to_a = and_(a=c_instruction, b=instructions[5])
 
-    # # # # # # # # # # # # # # Register A
-    # instructions[5] represents whether A is the destination
-    alu_to_a = and_(a=c_instruction, b=instructions[5])
+        # If it's a C instruction and the destination is A then send the ALU output
+        # to the A register. Otherwise send the instruction to Register A.
+        register_a_input = mux_16(alu_to_a, instructions, alu_out)
 
-    # If it's a C instruction and the destination is A then send the ALU output
-    # to the A register. Otherwise send the instruction to Register A.
-    register_a_input = mux_16(alu_to_a, instructions, alu_out)  # TODO: Add sequential logic.
+        # load_a is True if it is an A instruction or the C instruction has A as
+        # the destination.
+        load_a = or_(a_instruction, alu_to_a)
+        a_to_pc = a_register(register_a_input, load_a)
+        register_a_out = a_to_pc
+        m_address = a_to_pc[0:15]  # Returned as output ->
 
-    # load_a is True if it is an A instruction or the C instruction has A as
-    # the destination.
-    load_a = or_(a_instruction, alu_to_a)
-    a_to_pc = a_register(register_a_input, load_a)
-    register_a_out = a_to_pc
-    m_address = a_to_pc[0:15]  # Returned as output ->
+        # if instructions[12] is True M should be used instead of the A register
+        am_mux_out = mux_16(instructions[12], register_a_out, m_in)
 
-    # if instructions[12] is True M should be used instead of the A register
-    am_mux_out = mux_16(instructions[12], register_a_out, m_in)
+        # # # # # # # # # # # # # # Register D
+        # If instructions[4] is True the D register is the destination (if it is a
+        # c instruction).
+        load_d = and_(a=c_instruction, b=instructions[4])
+        register_d_out = d_register(alu_out, load_d)
 
-    # # # # # # # # # # # # # # Register D
-    # If instructions[4] is True the D register is the destination (if it is a
-    # c instruction).
-    load_d = and_(a=c_instruction, b=instructions[4])
-    register_d_out = d_register(load_d, alu_out)  # TODO: Fix d register?
+        # # # # # # # # # # # # # # ALU
+        # Send the register_d_out into the ALU
+        alu_out, zero_out, neg_out = alu(x=register_d_out,
+                                         y=am_mux_out,
+                                         zero_x=instructions[11],
+                                         negate_x=instructions[10],
+                                         zero_y=instructions[9],
+                                         negate_y=instructions[8],
+                                         add_x_y=instructions[7],
+                                         negate_output=instructions[6])
 
-    # # # # # # # # # # # # # # ALU
-    # Send the register_d_out into the ALU
-    alu_out, zero_out, neg_out = alu(x=register_d_out,
-                                     y=am_mux_out,
-                                     zero_x=instructions[11],
-                                     negate_x=instructions[10],
-                                     zero_y=instructions[9],
-                                     negate_y=instructions[8],
-                                     add_x_y=instructions[7],
-                                     negate_output=instructions[6])
-    
-    m_out = alu_out  # Returned as output ->
-    
-    # If it is a C instruction and the destination is M, write to M
-    write_m = and_(c_instruction, instructions[3])  # Returned as output ->
-    
-    # # # # # # # # # # # # # # PC / JUMP conditionals
-    # Jump if equal to zero
-    jeq = and_(zero_out, instructions[1])
-    # Jump if less than zero
-    jlt = and_(neg_out, instructions[2])
-    
-    # Zero or negative
-    zero_or_neg = or_(zero_out, neg_out)
-    # Positive
-    positive = not_(zero_or_neg)
-    
-    # Jump if greater than zero
-    jgt = and_(positive, instructions[0])
-    # Jump if less than or equal to zero
-    jle = or_(jeq, jlt)
-    
-    # If any conditions are met, ready the jump to A
-    # (less than or equal to and greater than cover all possible conditions
-    # so if either is True, there must be a jump).
-    jump_to_a = or_(jle, jgt)
-    
-    # Only jump if it a C instruction though!
-    load_pc = and_(c_instruction, jump_to_a)
-    # If not loading an address, increase the PC
-    inc_pc = not_(load_pc)
-    
-    # If any conditions were met then the PC will load the address,
-    # otherwise the PC will just increase the address to the program's next line.
-    pc_out = pc(a_to_pc, load_pc, inc_pc, reset)[:15] # returned as output
-    
-    return m_out, write_m, m_address, pc_out
-    
+        m_out = alu_out  # Returned as output ->
 
+        # If it is a C instruction and the destination is M, write to M
+        write_m = and_(c_instruction, instructions[3])  # Returned as output ->
+
+        # # # # # # # # # # # # # # PC / JUMP conditionals
+        # Jump if equal to zero
+        jeq = and_(zero_out, instructions[1])
+        # Jump if less than zero
+        jlt = and_(neg_out, instructions[2])
+
+        # Zero or negative
+        zero_or_neg = or_(zero_out, neg_out)
+        # Positive
+        positive = not_(zero_or_neg)
+
+        # Jump if greater than zero
+        jgt = and_(positive, instructions[0])
+        # Jump if less than or equal to zero
+        jle = or_(jeq, jlt)
+
+        # If any conditions are met, ready the jump to A
+        # (less than or equal to and greater than cover all possible conditions
+        # so if either is True, there must be a jump).
+        jump_to_a = or_(jle, jgt)
+
+        # Only jump if it a C instruction though!
+        load_pc = and_(c_instruction, jump_to_a)
+        # If not loading an address, increase the PC
+        inc_pc = not_(load_pc)
+
+        # If any conditions were met then the PC will load the address,
+        # otherwise the PC will just increase the address to the program's next line.
+        pc_out = pc(a_to_pc, load_pc, inc_pc, reset)[:15]  # returned as output
+
+        return m_out, write_m, m_address, pc_out
+
+    return cpu
