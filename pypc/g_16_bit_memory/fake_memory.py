@@ -20,5 +20,5 @@ class FakeRAM:
             print('loading new value: ', bool16_to_int(in_))
             self.data_dec[bool16_to_int(address)] = bool16_to_int(in_)
             self.data[address] = in_
-        print('reading from address ', bool16_to_int(address))
+        print('reading from address ', bool16_to_int(address), ': ', bool16_to_int(self.data[address]))
         return self.data[address]

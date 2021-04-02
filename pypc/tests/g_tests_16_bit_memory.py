@@ -21,7 +21,6 @@ def run_tests(test_class):
 class TestMemory16(unittest.TestCase):
     def setUp(self):
         self.test_numbers = [-32768, -1, 0, 1, 32767, -21845, 21845, 10922, -10922]
-        
 
     def _load_memory(self, register: Callable, num: int):
         num_bool16 = int_to_bool16(num)
@@ -133,7 +132,7 @@ class TestMemory16(unittest.TestCase):
         ram_64 = ram_64_factory()
         nums = [int_to_bool16(randint(-32000, 32000)) for _ in range(64)]
         addresses = list(product([True, False], repeat=6))
-        
+
         for num, address in zip(nums, addresses):
             ram_64(in_=num, load=True, address=address)
 
@@ -145,7 +144,7 @@ class TestMemory16(unittest.TestCase):
         nums = [int_to_bool16(randint(-32000, 32000)) for _ in range(512)]
         addresses = list(product([True, False], repeat=9))
         ram_512 = ram_512_factory()
-        
+
         for num, address in zip(nums, addresses):
             ram_512(in_=num, load=True, address=address)
 
@@ -158,7 +157,7 @@ class TestMemory16(unittest.TestCase):
         nums = [int_to_bool16(randint(-32000, 32000)) for _ in range(50)]
         addresses = sample(list(product([True, False], repeat=12)), 50)
         ram_4k = ram_4k_factory()
-        
+
         for num, address in zip(nums, addresses):
             ram_4k(in_=num, load=True, address=address)
 
@@ -171,26 +170,26 @@ class TestMemory16(unittest.TestCase):
         nums = [int_to_bool16(randint(-32000, 32000)) for _ in range(50)]
         addresses = sample(list(product([True, False], repeat=14)), 50)
         ram_16k = ram_16k_factory()
-        
+
         for num, address in zip(nums, addresses):
             ram_16k(in_=num, load=True, address=address)
 
         for num, address in zip(nums, addresses):
             out = ram_16k(in_=(False,) * 16, load=False, address=address)
             self.assertEqual(num, out)
-            
+
     def test_fake_ram_16k(self):
         # Limit test to 50 random integers stored in 50 random addresses
         nums = [int_to_bool16(randint(-32000, 32000)) for _ in range(50)]
         addresses = sample(list(product([True, False], repeat=14)), 50)
         fake_ram_16k = FakeRAM()
-        
+
         for num, address in zip(nums, addresses):
             fake_ram_16k(in_=num, load=True, address=address)
 
         for num, address in zip(nums, addresses):
             out = fake_ram_16k(in_=(False,) * 16, load=False, address=address)
             self.assertEqual(num, out)
-            
+
 
 run_tests(TestMemory16)

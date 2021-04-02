@@ -10,7 +10,7 @@ class ROM:
         
     def read_file(self):
         with open(self.file, encoding='utf-8-sig') as f:
-            self.data = [x for x in f.read().split('\n') if x]
+            self.data = [x[::-1] for x in f.read().split('\n') if x]
         
     def read_address(self, address):
         address_index = bool16_to_int(address)

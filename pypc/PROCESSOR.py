@@ -17,7 +17,7 @@ if __name__ == "__main__":
     keyboard = FakeRAM()
     memory = fake_memory_factory(ram, screen, keyboard)
     computer = computer_factory_with_fake_ram(memory)
-    for _ in range(100):
+    for _ in range(3):
         computer(reset=False, rom=rom)
     print(ram.data_dec)
         
